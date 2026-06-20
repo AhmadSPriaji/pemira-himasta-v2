@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Student {
+  id         String    @id @default(uuid())
+  nim        String    @unique
+  password   String
+  generation String
+  isVoted    Boolean   @default(false)
+  votedAt    DateTime?
+  Vote       Vote?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Candidate {
+  id             String   @id @default(uuid())
+  candidateNumber Int     @unique
+  name           String
+  photoUrl       String?
+  cvUrl          String?
+  grandDesignUrl String?
+  vision         String
+  missions       Json
+  innovations    Json
+  Votes          Vote[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model LandingInfo {
+  id            String   @id @default(uuid())
+  title         String
+  year          String
+  about         String
+  address       String
+  instagramUrl  String
+  logoWarnaUrl  String?
+  logoPutihUrl  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TimelineEvent {
+  id            String   @id @default(uuid())
+  eventName     String
+  startDate     DateTime
+  endDate       DateTime
+  displayDate   String
+  isVotingEvent Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Vote {
+  id          String    @id @default(uuid())
+  studentId   String    @unique
+  candidateId String
+  createdAt   DateTime  @default(now())
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+}
