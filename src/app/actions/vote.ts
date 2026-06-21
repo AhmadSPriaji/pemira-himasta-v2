@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma"
 
 export async function submitVote(candidateId: string) {
   try {
-    const studentId = cookies().get("student_session")?.value
+    const cookieStore = await cookies()
+    const studentId = cookieStore.get("student_session")?.value
 
     if (!studentId) {
       return { success: false, error: "Sesi tidak valid. Silakan login kembali." }
