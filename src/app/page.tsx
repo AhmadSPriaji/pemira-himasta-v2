@@ -7,7 +7,7 @@ export default async function Home() {
   // Fetch data
   const landingInfo = await prisma.landingInfo.findFirst()
   const timelineEvents = await prisma.timelineEvent.findMany({
-    orderBy: { startDate: 'asc' }
+    orderBy: { createdAt: 'asc' }
   })
   const candidates = await prisma.candidate.findMany({
     orderBy: { candidateNumber: 'asc' }

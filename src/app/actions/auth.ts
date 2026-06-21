@@ -18,7 +18,8 @@ export async function loginStudent(username: string, password: string) {
     }
 
     // Set cookie
-    cookies().set("student_session", student.id, {
+    const cookieStore = await cookies()
+    cookieStore.set("student_session", student.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 2, // 2 hours
@@ -32,5 +33,6 @@ export async function loginStudent(username: string, password: string) {
 }
 
 export async function logoutStudent() {
-  cookies().delete("student_session")
+  const cookieStore = await cookies()
+  cookieStore.delete("student_session")
 }

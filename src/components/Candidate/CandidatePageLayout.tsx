@@ -8,6 +8,15 @@ type CandidateProps = PrismaCandidate & {
   missions: string[]
 }
 
+function formatGDriveUrl(url: string | null) {
+  if (!url) return ""
+  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/)
+  if (match && match[1]) {
+    return `https://drive.google.com/file/d/${match[1]}/preview`
+  }
+  return url
+}
+
 export default function CandidatePageLayout({
   candidate,
   index,
@@ -57,7 +66,7 @@ export default function CandidatePageLayout({
           <div className="h-[538px]  w-full bg-red">
             <iframe
               id="frame"
-              src={candidate.cvUrl}
+              src={formatGDriveUrl(candidate.cvUrl)}
               className="h-full w-full overflow-x-hidden"
               title="Curriculum Vitae"
             ></iframe>
@@ -71,7 +80,7 @@ export default function CandidatePageLayout({
           <div className="h-[538px]  w-full bg-red">
             <iframe
               id="frame"
-              src={candidate.grandDesignUrl}
+              src={formatGDriveUrl(candidate.grandDesignUrl)}
               className="h-full w-full overflow-x-hidden"
               title="Curriculum Vitae"
             ></iframe>

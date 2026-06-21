@@ -27,6 +27,7 @@ model Student {
   nim        String    @unique
   password   String
   generation String
+  isActive   Boolean   @default(false)
   isVoted    Boolean   @default(false)
   votedAt    DateTime?
   Vote       Vote?
@@ -65,8 +66,6 @@ model LandingInfo {
 model TimelineEvent {
   id            String   @id @default(uuid())
   eventName     String
-  startDate     DateTime
-  endDate       DateTime
   displayDate   String
   isVotingEvent Boolean  @default(false)
   createdAt     DateTime @default(now())
