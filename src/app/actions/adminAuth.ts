@@ -1,24 +1,32 @@
 "use server"
 
 import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import bcrypt from "bcryptjs"
 
-export async function loginAdmin(username: string, passwordHash: string) {
+export async function loginAdmin(email: string, passwordPlain: string) {
   try {
     // Auto-seed default admin if no admins exist
     const adminCount = await prisma.admin.count()
     if (adminCount === 0) {
+      const defaultPassword = await bcrypt.hash("password123", 10)
       await prisma.admin.create({
-        data: { username: "admin", passwordHash: "password123" }
+        data: { email: "admin@example.com", passwordHash: defaultPassword }
       })
     }
 
     const admin = await prisma.admin.findUnique({
-      where: { username },
+      where: { email },
     })
 
-    if (!admin || admin.passwordHash !== passwordHash) {
-      return { success: false, error: "Username atau password salah." }
+    if (!admin || !admin.passwordHash) {
+      return { success: false, error: "Email atau password salah." }
+    }
+
+    const isValid = await bcrypt.compare(passwordPlain, admin.passwordHash)
+    if (!isValid) {
+      return { success: false, error: "Email atau password salah." }
     }
 
     // Set cookie
@@ -39,4 +47,6 @@ export async function loginAdmin(username: string, passwordHash: string) {
 export async function logoutAdmin() {
   const cookieStore = await cookies()
   cookieStore.delete("admin_session")
+  redirect("/admin/login")
 }
+

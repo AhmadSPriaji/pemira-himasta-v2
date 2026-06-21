@@ -1,6 +1,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -9,7 +10,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { Home, Users, Settings, UserCheck, LayoutDashboard } from "lucide-react"
+import { Home, Users, Settings, UserCheck, LayoutDashboard, Shield, BarChart, LogOut } from "lucide-react"
+import { logoutAdmin } from "@/app/actions/adminAuth"
 
 const menuItems = [
   {
@@ -35,6 +37,16 @@ const menuItems = [
   {
     title: "Hasil Voting",
     url: "/admin/results",
+    icon: BarChart,
+  },
+  {
+    title: "Manajemen Admin",
+    url: "/admin/admins",
+    icon: Shield,
+  },
+  {
+    title: "Pengaturan Akun",
+    url: "/admin/settings",
     icon: Settings,
   },
 ]
@@ -59,6 +71,18 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <form action={logoutAdmin}>
+              <SidebarMenuButton type="submit" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50">
+                <LogOut />
+                <span>Keluar</span>
+              </SidebarMenuButton>
+            </form>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }
