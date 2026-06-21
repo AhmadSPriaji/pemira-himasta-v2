@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { loginAdmin } from "@/app/actions/adminAuth"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,7 +12,7 @@ import { AlertCircle } from "lucide-react"
 
 export default function AdminLoginPage() {
   const router = useRouter()
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,9 +22,7 @@ export default function AdminLoginPage() {
     setIsLoading(true)
     setError(null)
     
-    // For this simple example, we compare plain password hash (or hash it if required)
-    // In production, you would use bcrypt on the server.
-    const res = await loginAdmin(username, password)
+    const res = await loginAdmin(email, password)
     if (res.success) {
       router.push("/admin")
     } else {
@@ -38,7 +37,7 @@ export default function AdminLoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Masukkan username dan password admin untuk mengakses dashboard.
+            Masukkan email dan password admin untuk mengakses dashboard.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
@@ -50,17 +49,22 @@ export default function AdminLoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
+                id="email"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link href="/admin/forgot-password" className="text-xs text-primary hover:underline">
+                  Lupa Password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -80,3 +84,4 @@ export default function AdminLoginPage() {
     </div>
   )
 }
+
