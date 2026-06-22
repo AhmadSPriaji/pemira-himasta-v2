@@ -1,7 +1,20 @@
 "use server"
 
+import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+
+async function getAdminSession() {
+  const cookieStore = await cookies()
+  const sessionId = cookieStore.get("admin_session")?.value
+  if (!sessionId) return null
+
+  const admin = await prisma.admin.findUnique({
+    where: { id: sessionId },
+  })
+  
+  return admin
+}
 
 export async function updateLandingInfo(data: {
   title: string
@@ -10,6 +23,9 @@ export async function updateLandingInfo(data: {
   address: string
   instagramUrl: string
 }) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     let landingInfo = await prisma.landingInfo.findFirst()
     
@@ -37,6 +53,9 @@ export async function addTimelineEvent(data: {
   displayDate: string
   isVotingEvent: boolean
 }) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.timelineEvent.create({ data })
     revalidatePath("/")
@@ -48,6 +67,9 @@ export async function addTimelineEvent(data: {
 }
 
 export async function deleteTimelineEvent(id: string) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.timelineEvent.delete({ where: { id } })
     revalidatePath("/")

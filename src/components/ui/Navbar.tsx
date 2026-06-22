@@ -1,5 +1,4 @@
 "use client"
-import useCandidates from "@/hooks/candidate/useCandidates"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Menu, Transition } from "@headlessui/react"
@@ -17,7 +16,6 @@ const candidates = [
 
 function Navbar() {
   const router = useRouter()
-  // const { candidates } = useCandidates()
   const [isHovered, setIsHovered] = useState(false)
   const [isClicked, setIsClicked] = useState(false)
   const [isOffset, setIsOffset] = useState(false)
@@ -78,6 +76,7 @@ function Navbar() {
           ></span>
         </div>
         <Transition
+          as="div"
           show={isOpened}
           enter="transition ease-out duration-200"
           enterFrom="transform opacity-0 scale-95"

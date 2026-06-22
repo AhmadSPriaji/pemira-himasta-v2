@@ -1,9 +1,25 @@
 "use server"
 
+import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
+async function getAdminSession() {
+  const cookieStore = await cookies()
+  const sessionId = cookieStore.get("admin_session")?.value
+  if (!sessionId) return null
+
+  const admin = await prisma.admin.findUnique({
+    where: { id: sessionId },
+  })
+  
+  return admin
+}
+
 export async function addVoter(data: { nim: string; password?: string; generation: string }) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     // Generate random 6 char password if not provided
     const password = data.password || Math.random().toString(36).slice(-6).toUpperCase()
@@ -23,6 +39,9 @@ export async function addVoter(data: { nim: string; password?: string; generatio
 }
 
 export async function deleteVoter(id: string) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.student.delete({ where: { id } })
     revalidatePath("/admin/voters")
@@ -33,6 +52,9 @@ export async function deleteVoter(id: string) {
 }
 
 export async function resetVoterStatus(id: string) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     // Reset isVoted to false and delete associated Vote
     await prisma.$transaction(async (tx) => {
@@ -52,6 +74,9 @@ export async function resetVoterStatus(id: string) {
 }
 
 export async function importVotersCsv(voters: { nim: string; generation: string }[]) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     const data = voters.map(v => ({
       nim: v.nim,
@@ -72,6 +97,9 @@ export async function importVotersCsv(voters: { nim: string; generation: string 
 }
 
 export async function toggleVoterStatus(id: string, isActive: boolean) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.student.update({
       where: { id },
@@ -85,6 +113,9 @@ export async function toggleVoterStatus(id: string, isActive: boolean) {
 }
 
 export async function toggleVotersByGeneration(generation: string, isActive: boolean) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     const result = await prisma.student.updateMany({
       where: { generation },
