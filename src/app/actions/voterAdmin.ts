@@ -78,9 +78,20 @@ export async function importVotersCsv(voters: { nim: string; generation: string 
   if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
 
   try {
-    const data = voters.map(v => ({
-      nim: v.nim,
-      generation: v.generation,
+    // Filter data yang tidak valid
+    const validVoters = voters.filter(v => {
+      if (!v.nim || v.nim.trim() === '') return false
+      if (!/^\d{4}$/.test(v.generation.trim())) return false // harus angka 4 digit (tahun)
+      return true
+    })
+
+    if (validVoters.length === 0) {
+      return { success: false, error: "Tidak ada data valid yang bisa diimport. Pastikan format CSV: nim,angkatan (contoh: 12345678,2023)" }
+    }
+
+    const data = validVoters.map(v => ({
+      nim: v.nim.trim(),
+      generation: v.generation.trim(),
       password: Math.random().toString(36).slice(-6).toUpperCase()
     }))
 
@@ -90,7 +101,7 @@ export async function importVotersCsv(voters: { nim: string; generation: string 
     })
 
     revalidatePath("/admin/voters")
-    return { success: true }
+    return { success: true, count: data.length }
   } catch (error) {
     return { success: false, error: "Gagal mengimport CSV." }
   }

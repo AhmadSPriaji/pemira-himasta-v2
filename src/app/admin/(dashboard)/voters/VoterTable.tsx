@@ -138,10 +138,15 @@ export function VoterTable({ voters }: { voters: Student[] }) {
           parsed.shift()
         }
 
-        await importVotersCsv(parsed)
+        const result = await importVotersCsv(parsed)
         setIsCsvOpen(false)
         setCsvFile(null)
-        toast.success(`Berhasil mengimport ${parsed.length} data.`)
+
+        if (result.success) {
+          toast.success(`Berhasil mengimport ${result.count} data voter.`)
+        } else {
+          toast.error(result.error || "Gagal mengimport data.")
+        }
       } catch (error) {
         toast.error("Gagal mengimport CSV.")
       } finally {
