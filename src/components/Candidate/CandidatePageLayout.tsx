@@ -81,10 +81,10 @@ export default function CandidatePageLayout({
           <HeaderText text="Grand Design" className="py-10" />
           <div className="h-[538px]  w-full bg-red">
             <iframe
-              id="frame"
+              id="frame-grand-design"
               src={formatGDriveUrl(candidate.grandDesignUrl)}
               className="h-full w-full overflow-x-hidden"
-              title="Curriculum Vitae"
+              title="Grand Design"
             ></iframe>
           </div>
         </section>
