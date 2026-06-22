@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
-import { Trash2, RotateCcw, Upload, Power } from "lucide-react"
+import { Trash2, RotateCcw, Upload, Power, Loader2 } from "lucide-react"
 
 type Student = {
   id: string
@@ -36,6 +36,8 @@ export function VoterTable({ voters }: { voters: Student[] }) {
     action: "activate"
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean
     title: string
@@ -58,9 +60,14 @@ export function VoterTable({ voters }: { voters: Student[] }) {
 
   const handleAdd = async () => {
     if (!formData.nim) return
-    await addVoter(formData)
-    setIsOpen(false)
-    setFormData({ nim: "", generation: "2023" })
+    setIsLoading(true)
+    try {
+      await addVoter(formData)
+      setIsOpen(false)
+      setFormData({ nim: "", generation: "2023" })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleDelete = (id: string) => {
@@ -114,25 +121,32 @@ export function VoterTable({ voters }: { voters: Student[] }) {
 
   const handleImportCsv = async () => {
     if (!csvFile) return
+    setIsLoading(true)
     const reader = new FileReader()
     reader.onload = async (e) => {
-      const text = e.target?.result as string
-      // Basic CSV parser (NIM, Generation)
-      const rows = text.split("\n").filter(row => row.trim() !== "")
-      const parsed = rows.map(row => {
-        const [nim, generation] = row.split(",").map(s => s.trim())
-        return { nim, generation: generation || "Unknown" }
-      })
+      try {
+        const text = e.target?.result as string
+        // Basic CSV parser (NIM, Generation)
+        const rows = text.split("\n").filter(row => row.trim() !== "")
+        const parsed = rows.map(row => {
+          const [nim, generation] = row.split(",").map(s => s.trim())
+          return { nim, generation: generation || "Unknown" }
+        })
 
-      // Remove header if it exists
-      if (parsed[0].nim.toLowerCase() === "nim") {
-        parsed.shift()
+        // Remove header if it exists
+        if (parsed[0].nim.toLowerCase() === "nim") {
+          parsed.shift()
+        }
+
+        await importVotersCsv(parsed)
+        setIsCsvOpen(false)
+        setCsvFile(null)
+        toast.success(`Berhasil mengimport ${parsed.length} data.`)
+      } catch (error) {
+        toast.error("Gagal mengimport CSV.")
+      } finally {
+        setIsLoading(false)
       }
-
-      await importVotersCsv(parsed)
-      setIsCsvOpen(false)
-      setCsvFile(null)
-      toast.success(`Berhasil mengimport ${parsed.length} data.`)
     }
     reader.readAsText(csvFile)
   }
@@ -140,12 +154,12 @@ export function VoterTable({ voters }: { voters: Student[] }) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap">
-        <Button onClick={() => setIsOpen(true)}>Tambah Pemilih</Button>
-        <Button variant="secondary" onClick={() => setIsCsvOpen(true)}>
+        <Button onClick={() => setIsOpen(true)} disabled={isLoading}>Tambah Pemilih</Button>
+        <Button variant="secondary" onClick={() => setIsCsvOpen(true)} disabled={isLoading}>
           <Upload className="w-4 h-4 mr-2" />
           Import CSV
         </Button>
-        <Button variant="outline" onClick={() => setIsBulkToggleOpen(true)}>
+        <Button variant="outline" onClick={() => setIsBulkToggleOpen(true)} disabled={isLoading}>
           <Power className="w-4 h-4 mr-2" />
           Aktifkan/Nonaktifkan Angkatan
         </Button>
@@ -188,13 +202,13 @@ export function VoterTable({ voters }: { voters: Student[] }) {
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant={v.isActive ? "secondary" : "default"} size="sm" onClick={() => handleToggleActive(v.id, v.isActive)}>
+                  <Button variant={v.isActive ? "secondary" : "default"} size="sm" onClick={() => handleToggleActive(v.id, v.isActive)} disabled={isLoading}>
                     {v.isActive ? "Nonaktifkan" : "Aktifkan"}
                   </Button>
-                  <Button variant="outline" size="icon" title="Reset Vote" onClick={() => handleReset(v.id)}>
+                  <Button variant="outline" size="icon" title="Reset Vote" onClick={() => handleReset(v.id)} disabled={isLoading}>
                     <RotateCcw className="w-4 h-4" />
                   </Button>
-                  <Button variant="destructive" size="icon" onClick={() => handleDelete(v.id)}>
+                  <Button variant="destructive" size="icon" onClick={() => handleDelete(v.id)} disabled={isLoading}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -226,8 +240,11 @@ export function VoterTable({ voters }: { voters: Student[] }) {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>Batal</Button>
-            <Button onClick={handleAdd}>Simpan</Button>
+            <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>Batal</Button>
+            <Button onClick={handleAdd} disabled={isLoading}>
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Simpan
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -249,8 +266,11 @@ export function VoterTable({ voters }: { voters: Student[] }) {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsCsvOpen(false)}>Batal</Button>
-            <Button onClick={handleImportCsv} disabled={!csvFile}>Import</Button>
+            <Button variant="outline" onClick={() => setIsCsvOpen(false)} disabled={isLoading}>Batal</Button>
+            <Button onClick={handleImportCsv} disabled={!csvFile || isLoading}>
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Import
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -279,8 +299,8 @@ export function VoterTable({ voters }: { voters: Student[] }) {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsBulkToggleOpen(false)}>Batal</Button>
-            <Button onClick={handleBulkToggle}>Terapkan</Button>
+            <Button variant="outline" onClick={() => setIsBulkToggleOpen(false)} disabled={isLoading}>Batal</Button>
+            <Button onClick={handleBulkToggle} disabled={isLoading}>Terapkan</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -293,11 +313,19 @@ export function VoterTable({ voters }: { voters: Student[] }) {
             <DialogDescription>{confirmConfig.description}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Batal</Button>
+            <Button variant="outline" onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} disabled={isLoading}>Batal</Button>
             <Button variant={confirmConfig.variant} onClick={async () => {
-              await confirmConfig.onConfirm()
-              setConfirmConfig(prev => ({ ...prev, isOpen: false }))
-            }}>{confirmConfig.actionLabel}</Button>
+              setIsLoading(true)
+              try {
+                await confirmConfig.onConfirm()
+              } finally {
+                setIsLoading(false)
+                setConfirmConfig(prev => ({ ...prev, isOpen: false }))
+              }
+            }} disabled={isLoading}>
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              {confirmConfig.actionLabel}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

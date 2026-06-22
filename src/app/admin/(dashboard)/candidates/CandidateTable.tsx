@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Trash2, Edit } from "lucide-react"
+import { Trash2, Edit, Loader2 } from "lucide-react"
 
 type Innovation = { name: string; explanation: string[] }
 
@@ -27,6 +27,7 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [currentId, setCurrentId] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     candidateNumber: 1,
@@ -78,8 +79,13 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
 
   const confirmDelete = async () => {
     if (!deleteTarget) return
-    await deleteCandidate(deleteTarget)
-    setDeleteTarget(null)
+    setIsLoading(true)
+    try {
+      await deleteCandidate(deleteTarget)
+    } finally {
+      setIsLoading(false)
+      setDeleteTarget(null)
+    }
   }
 
   const handleSave = async () => {
@@ -89,12 +95,17 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
       innovations: formData.innovations.filter(i => i.name.trim() !== "")
     }
 
-    if (isEdit) {
-      await updateCandidate(currentId, payload)
-    } else {
-      await addCandidate(payload)
+    setIsLoading(true)
+    try {
+      if (isEdit) {
+        await updateCandidate(currentId, payload)
+      } else {
+        await addCandidate(payload)
+      }
+      setIsOpen(false)
+    } finally {
+      setIsLoading(false)
     }
-    setIsOpen(false)
   }
 
   return (
@@ -118,10 +129,10 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
               <TableCell className="max-w-[200px] truncate">{c.vision}</TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon" onClick={() => handleOpenEdit(c)}>
+                  <Button variant="outline" size="icon" onClick={() => handleOpenEdit(c)} disabled={isLoading}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="destructive" size="icon" onClick={() => handleDelete(c.id)}>
+                  <Button variant="destructive" size="icon" onClick={() => handleDelete(c.id)} disabled={isLoading}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -227,8 +238,11 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
 
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>Batal</Button>
-            <Button onClick={handleSave}>Simpan</Button>
+            <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>Batal</Button>
+            <Button onClick={handleSave} disabled={isLoading}>
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Simpan
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -241,8 +255,11 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Batal</Button>
-            <Button variant="destructive" onClick={confirmDelete}>Ya, Hapus</Button>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={isLoading}>Batal</Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={isLoading}>
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Ya, Hapus
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
