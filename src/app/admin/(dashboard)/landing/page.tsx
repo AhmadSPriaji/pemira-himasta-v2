@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export default async function LandingAdminPage() {
   const landingInfo = await prisma.landingInfo.findFirst()
   const timeline = await prisma.timelineEvent.findMany({
-    orderBy: { createdAt: 'asc' }
+    orderBy: { sortOrder: 'asc' }
   })
 
   return (
