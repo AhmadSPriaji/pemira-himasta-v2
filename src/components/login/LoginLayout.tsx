@@ -39,6 +39,7 @@ export default function LoginLayout({
       }`}>
         <HeaderText
           text="Login"
+          as="h1"
           className="mb-12 text-yellow md:mb-16 2xl:mb-24"
         />
         <StepProgressBar items={votingContent} onStep={1} />

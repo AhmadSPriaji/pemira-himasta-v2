@@ -85,7 +85,7 @@ export default function CandidatePageLayout({
                 src={"/landing/frame.png"}
                 width={500}
                 height={500}
-                alt="frame"
+                alt=""
                 className="relative z-20 h-auto w-[200px] md:w-[300px] lg:w-[400px] 2xl:w-[500px]"
               />
 
@@ -93,18 +93,18 @@ export default function CandidatePageLayout({
                 src={candidate.photoUrl || ""}
                 width={300}
                 height={350}
-                alt="Candidate"
+                alt={candidate.name}
                 className="absolute inset-0 m-auto h-auto w-[90px] md:w-[144px] lg:w-[194px] 2xl:w-[240px]"
               />
             </div>
 
-            <h1
-              className={`absolute -bottom-6 z-30 font-head text-[100px] text-white md:text-[160px] lg:-bottom-12 lg:text-[216px] 2xl:text-[256px] ${
+            <span
+              className={`absolute -bottom-6 z-30 font-head text-[100px] text-white md:text-[160px] lg:-bottom-12 lg:text-[216px] 2xl:text-[256px] select-none ${
                 index == "1" ? "right-6 lg:right-10" : "right-3 lg:right-5"
               }`}
             >
               {index}
-            </h1>
+            </span>
           </div>
           <h1 className="w-1/3 break-keep pb-4 font-head text-3xl text-white md:pb-14 md:text-5xl lg:text-7xl 2xl:text-8xl">
             {candidate.name}
@@ -144,17 +144,17 @@ export default function CandidatePageLayout({
         <div className="flex h-fit w-full flex-col lg:flex-row">
           <div className=" flex flex-col bg-navy p-8 py-16 lg:w-[50%] lg:p-16 lg:py-20 2xl:p-24 2xl:py-36   ">
             <div className="flex justify-center pb-6 text-3xl text-yellow lg:pb-8 lg:text-5xl 2xl:pb-12 2xl:text-[64px]">
-              <h1 className="font-head  ">Visi</h1>
+              <h2 className="font-head">Visi</h2>
             </div>
 
             <div className=" text-justify text-base text-white lg:text-lg 2xl:text-2xl ">
-              <h1>{candidate.vision}</h1>
+              <p>{candidate.vision}</p>
             </div>
           </div>
 
           <div className="flex flex-col bg-navy/50 p-8 py-16 lg:w-[50%] lg:p-16 lg:py-20 2xl:p-24 2xl:py-36 ">
             <div className="flex justify-center pb-6 text-3xl text-yellow lg:pb-8 lg:text-5xl 2xl:pb-12 2xl:text-[64px]">
-              <h1 className="font-head">Misi</h1>
+              <h2 className="font-head">Misi</h2>
             </div>
 
             <div className="text-justify  text-base text-white lg:text-lg 2xl:text-2xl">
@@ -169,9 +169,9 @@ export default function CandidatePageLayout({
                         {index + 1}
                       </p>
                     </div>
-                    <h1 className=" overflow-auto leading-[1.2] text-white">
+                    <p className=" overflow-auto leading-[1.2] text-white">
                       {mission}
-                    </h1>
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -179,9 +179,9 @@ export default function CandidatePageLayout({
           </div>
 
           <div className="w-max-full mt-12 flex h-fit flex-col justify-center bg-[#21201da4] py-5 text-[#21201D] md:hidden">
-            <h1 className=" mb-3 text-center text-[20px] text-white">
+            <h2 className=" mb-3 text-center text-[20px] text-white">
               Unduh Disini
-            </h1>
+            </h2>
             <div className="m-auto flex h-fit flex-col justify-center gap-7 text-[25px]">
               {candidate.cvUrl && (
                 <a

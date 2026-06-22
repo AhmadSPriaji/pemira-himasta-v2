@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Menu, Transition } from "@headlessui/react"
+import Link from "next/link"
 
 export type NavbarCandidate = {
   candidateNumber: number
@@ -30,22 +31,18 @@ function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
         isOffset ? "drop-shadow-lg" : ""
       } fixed top-0 z-50 flex h-12 w-full items-center justify-end gap-6 bg-navy px-8 text-center font-head text-[20px] text-yellow lg:h-16 lg:gap-10 lg:px-[72px] lg:text-[28px] 2xl:h-[108px] 2xl:gap-[59px] 2xl:px-24 2xl:text-[40px]`}
     >
-      <div
-        onClick={() => {
-          router.push("/")
-        }}
+      <Link
+        href="/"
         className="flex cursor-pointer items-center justify-center transition ease-in-out hover:text-white"
       >
-        <p className="">Home</p>
-      </div>
-      <div
-        onClick={() => {
-          router.push("/login")
-        }}
+        Home
+      </Link>
+      <Link
+        href="/login"
         className="flex cursor-pointer items-center justify-center transition ease-in-out hover:text-white"
       >
-        <p className="">Voting</p>
-      </div>
+        Voting
+      </Link>
 
       <div
         onClick={() => {
@@ -83,15 +80,13 @@ function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
           }  absolute top-12 flex flex-col gap-2 bg-navy px-8 py-4 text-left text-base drop-shadow-md lg:top-16 lg:gap-4 lg:px-10 lg:py-5 lg:text-xl 2xl:top-[108px] 2xl:gap-5 2xl:px-12 2xl:py-6 2xl:text-2xl`}
         >
           {candidates.map((candidate, index) => (
-            <p
+            <Link
               key={index}
-              onClick={() => {
-                router.push("/candidate/" + candidate.candidateNumber)
-              }}
-              className="w-24 text-yellow transition-all duration-200 ease-out hover:text-white lg:w-32 2xl:w-36"
+              href={"/candidate/" + candidate.candidateNumber}
+              className="block w-24 text-yellow transition-all duration-200 ease-out hover:text-white lg:w-32 2xl:w-36"
             >
               {candidate.name}
-            </p>
+            </Link>
           ))}
         </Transition>
       </div>

@@ -25,6 +25,7 @@ export default function ResponsePage({
       }`}>
         <HeaderText
           text="Success"
+          as="h1"
           className="mb-12 text-yellow md:mb-16 2xl:mb-24"
         />
         <StepProgressBar items={votingContent} onStep={3} />

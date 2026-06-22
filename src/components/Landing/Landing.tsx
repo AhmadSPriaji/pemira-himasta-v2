@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import HeaderText from "../ui/HeaderText"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 type Candidate = {
   id: string
@@ -84,19 +85,19 @@ export default function Landing({ content }: LandingProps) {
               className={`mr-8 h-full w-auto lg:mr-12 2xl:mr-16 transition-all duration-1000 ease-out transform ${
                 mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"
               }`}
-              alt="hero"
+              alt="Maskot Pemira Himasta UGM"
               src="/landing/hero-img.svg"
               width={500}
               height={500}
               priority
             />
             <div className="flex h-full items-center justify-center">
-              <p className={`text-5xl font-thin lg:text-7xl 2xl:text-9xl transition-all duration-1000 ease-out transform ${
+              <h1 className={`text-5xl font-thin lg:text-7xl 2xl:text-9xl transition-all duration-1000 ease-out transform ${
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}>
                 {/* GANTI TAHUN */}
                 Pemilihan <br /> Raya <br /> Himasta <br /> {content.year}
-              </p>
+              </h1>
             </div>
           </div>
         </div>
@@ -109,7 +110,7 @@ export default function Landing({ content }: LandingProps) {
             <div className="flex w-full items-center justify-center px-10 py-8 lg:w-1/2 lg:px-[72px] lg:py-14 2xl:px-[135px] 2xl:py-[103px]">
               <Image
                 className="h-auto w-[40%] md:w-[20%] lg:w-[70%]"
-                alt="pemira 2023"
+                alt="Logo Himasta UGM Warna"
                 src="/landing/Himasta Warna.png"
                 width={500}
                 height={500}
@@ -138,7 +139,7 @@ export default function Landing({ content }: LandingProps) {
               <div className="h-full w-1 bg-yellow md:h-[5px] md:w-full "></div>
               <Image
                 className="-mt-3 h-5 w-auto rotate-90 md:-ml-[12.5px] md:-mt-0 md:h-[25px] md:rotate-0"
-                alt="triangle"
+                alt=""
                 src="/landing/triangle.svg"
                 width={500}
                 height={500}
@@ -151,7 +152,7 @@ export default function Landing({ content }: LandingProps) {
                     <div className="w-[88px] md:h-9 2xl:h-[44px]"></div>
                     <Image
                       className="z-10 -mb-[5.33px] h-8 w-auto 2xl:-mb-[8px] 2xl:h-10 "
-                      alt="star"
+                      alt=""
                       src="/landing/star-simetris.svg"
                       width={500}
                       height={500}
@@ -176,10 +177,10 @@ export default function Landing({ content }: LandingProps) {
               <HeaderText text="Candidate" className="mb-0 md:mb-4 2xl:mb-5" />
               <div className="flex flex-col items-center justify-center gap-4 md:gap-0 lg:flex-row">
                 {content.candidates.map((candidate, idx) => (
-                  <div
+                  <Link
                     key={idx}
-                    onClick={() => router.push("/candidate/" + candidate.candidateNumber)}
-                    className="flex flex-col items-center transition duration-500 ease-in-out hover:scale-110 2xl:hover:scale-[1.2]"
+                    href={"/candidate/" + candidate.candidateNumber}
+                    className="flex flex-col items-center transition duration-500 ease-in-out hover:scale-110 2xl:hover:scale-[1.2] cursor-pointer"
                   >
                     <div className="relative">
                       <div className="relative  h-fit">
@@ -192,7 +193,7 @@ export default function Landing({ content }: LandingProps) {
                         />
                         <Image
                           className="relative z-20 -mb-6 h-auto w-[300px] md:-mb-8 md:w-[360px] 2xl:w-[480px] "
-                          alt="frame"
+                          alt=""
                           src="/landing/frame.png"
                           width={500}
                           height={500}
@@ -208,7 +209,7 @@ export default function Landing({ content }: LandingProps) {
                         {candidate.name}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -221,7 +222,7 @@ export default function Landing({ content }: LandingProps) {
         <FadeIn className="flex items-end justify-around ">
           <Image
             src={"/landing/star-nofill.svg"}
-            alt="star"
+            alt=""
             width={500}
             height={500}
             className="mb-[132px] mr-8 hidden h-auto w-24 md:block 2xl:w-40"
@@ -236,18 +237,18 @@ export default function Landing({ content }: LandingProps) {
                 <p>{content.voteDate}</p>
               </div>
               <div className="flex justify-center">
-                <button
-                  onClick={() => router.push("/login")}
+                <Link
+                  href="/login"
                   className="rounded-full bg-yellow px-3 py-1 text-lg font-bold text-navy transition duration-300 ease-in-out hover:scale-110 active:scale-100 active:brightness-75 lg:px-4 lg:py-[6px] lg:text-xl 2xl:px-[23px] 2xl:py-[11px] 2xl:text-[32px] 2xl:leading-[38px]"
                 >
                   Vote Now
-                </button>
+                </Link>
               </div>
             </div>
           </div>
           <Image
             src={"/landing/star-nofill.svg"}
-            alt="star"
+            alt=""
             width={500}
             height={500}
             className="mb-[132px] ml-8 hidden h-auto w-24 md:block 2xl:w-40"
@@ -261,7 +262,7 @@ export default function Landing({ content }: LandingProps) {
           <div className="mb-8 text-[14px] md:mb-0">
             <Image
               src={"/landing/logo-himasta.png"}
-              alt={"Logo Himasta"}
+              alt="Logo Himasta UGM"
               height={500}
               width={500}
               className="mb-[14px] h-[54px] w-auto"
@@ -279,7 +280,7 @@ export default function Landing({ content }: LandingProps) {
             <div className="flex gap-2 text-xl">
               <Image
                 src={"/landing/icon-instagram.svg"}
-                alt={"Logo Instagram"}
+                alt="Logo Instagram Himasta UGM"
                 height={500}
                 width={500}
                 className="h-[30px] w-auto "
