@@ -1,6 +1,6 @@
 import Image from "next/image"
 import HeaderText from "../ui/HeaderText"
-import Navbar from "../ui/Navbar"
+import Navbar, { NavbarCandidate } from "../ui/Navbar"
 import { Candidate as PrismaCandidate } from "@prisma/client"
 
 type CandidateProps = PrismaCandidate & {
@@ -20,13 +20,15 @@ function formatGDriveUrl(url: string | null) {
 export default function CandidatePageLayout({
   candidate,
   index,
+  navbarCandidates,
 }: {
   index: string
   candidate: CandidateProps
+  navbarCandidates: NavbarCandidate[]
 }) {
   return (
     <main className="bg-navy pt-32">
-      <Navbar />
+      <Navbar candidates={navbarCandidates} />
       <section className="flex items-end justify-center">
         <div className="relative flex h-fit w-fit">
           <div className="flex justify-center">
