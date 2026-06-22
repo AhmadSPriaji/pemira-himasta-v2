@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarHeader,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { Home, Users, Settings, UserCheck, LayoutDashboard, Shield, BarChart, LogOut } from "lucide-react"
@@ -51,7 +52,7 @@ const menuItems = [
   },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({ currentAdminEmail }: { currentAdminEmail?: string | null }) {
   return (
     <Sidebar>
       <SidebarContent>
@@ -71,7 +72,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="pb-8">
+        <div className="px-3 py-2 border-b mb-2">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5 font-semibold">Masuk sebagai</p>
+          <p className="text-xs font-medium truncate" title={currentAdminEmail || undefined}>
+            {currentAdminEmail || "Admin"}
+          </p>
+        </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <form action={logoutAdmin}>
