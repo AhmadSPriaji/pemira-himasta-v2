@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { updateLandingInfo, addTimelineEvent, deleteTimelineEvent } from "@/app/actions/landingAdmin"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -33,6 +35,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
     instagramUrl: initialInfo?.instagramUrl || "https://instagram.com/himastaugm",
   })
   const [isSaving, setIsSaving] = useState(false)
+  const [deleteEventId, setDeleteEventId] = useState<string | null>(null)
 
   // Timeline State
   const [newEvent, setNewEvent] = useState({
@@ -46,15 +49,15 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
     const result = await updateLandingInfo(info)
     setIsSaving(false)
     if (result && !result.success) {
-      alert(result.error || "Gagal menyimpan info")
+      toast.error(result.error || "Gagal menyimpan info")
     } else {
-      alert("Berhasil menyimpan info.")
+      toast.success("Berhasil menyimpan info.")
     }
   }
 
   const handleAddEvent = async () => {
     if (!newEvent.eventName || !newEvent.displayDate) {
-      alert("Lengkapi semua form timeline.")
+      toast.error("Lengkapi semua form timeline.")
       return
     }
     const result = await addTimelineEvent({
@@ -64,20 +67,27 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
     })
     
     if (result && !result.success) {
-      alert(result.error || "Gagal menambahkan timeline")
+      toast.error(result.error || "Gagal menambahkan timeline")
       return
     }
     
+    toast.success("Timeline event berhasil ditambahkan")
     setNewEvent({ eventName: "", displayDate: "", isVotingEvent: false })
   }
 
-  const handleDeleteEvent = async (id: string) => {
-    if (confirm("Hapus event ini?")) {
-      const result = await deleteTimelineEvent(id)
-      if (result && !result.success) {
-        alert(result.error || "Gagal menghapus event")
-      }
+  const handleDeleteEventClick = (id: string) => {
+    setDeleteEventId(id)
+  }
+
+  const confirmDeleteEvent = async () => {
+    if (!deleteEventId) return
+    const result = await deleteTimelineEvent(deleteEventId)
+    if (result && !result.success) {
+      toast.error(result.error || "Gagal menghapus event")
+    } else {
+      toast.success("Event berhasil dihapus")
     }
+    setDeleteEventId(null)
   }
 
   return (
@@ -142,7 +152,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
                   <TableCell>{event.displayDate}</TableCell>
                   <TableCell>{event.isVotingEvent ? "Ya" : "Tidak"}</TableCell>
                   <TableCell>
-                    <Button variant="destructive" size="icon" onClick={() => handleDeleteEvent(event.id)}>
+                    <Button variant="destructive" size="icon" onClick={() => handleDeleteEventClick(event.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </TableCell>
@@ -173,6 +183,21 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={!!deleteEventId} onOpenChange={(open) => !open && setDeleteEventId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus Event</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus event ini? Tindakan ini tidak bisa dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteEventId(null)}>Batal</Button>
+            <Button variant="destructive" onClick={confirmDeleteEvent}>Ya, Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

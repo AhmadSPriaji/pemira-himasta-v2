@@ -40,6 +40,7 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
   const [isInviteOpen, setIsInviteOpen] = useState(false)
   const [emailToInvite, setEmailToInvite] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; email: string } | null>(null)
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,11 +65,13 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
     setIsLoading(false)
   }
 
-  const handleDelete = async (id: string, email: string) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus admin ${email}?`)) {
-      return
-    }
+  const handleDeleteClick = (id: string, email: string) => {
+    setDeleteTarget({ id, email })
+  }
 
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    const { id } = deleteTarget
     const res = await deleteAdmin(id)
     if (res.success) {
       toast.success("Admin berhasil dihapus")
@@ -79,6 +82,7 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
         description: res.error
       })
     }
+    setDeleteTarget(null)
   }
 
   return (
@@ -173,7 +177,7 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
                       variant="ghost" 
                       size="icon" 
                       className="text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDelete(admin.id, admin.email)}
+                      onClick={() => handleDeleteClick(admin.id, admin.email)}
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Hapus</span>
@@ -185,6 +189,20 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
           </TableBody>
         </Table>
       </div>
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus admin {deleteTarget?.email}? Tindakan ini tidak bisa dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Batal</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Ya, Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { addCandidate, updateCandidate, deleteCandidate } from "@/app/actions/candidateAdmin"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Trash2, Edit } from "lucide-react"
@@ -70,10 +70,16 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
     setIsOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Hapus kandidat ini?")) {
-      await deleteCandidate(id)
-    }
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+
+  const handleDelete = (id: string) => {
+    setDeleteTarget(id)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    await deleteCandidate(deleteTarget)
+    setDeleteTarget(null)
   }
 
   const handleSave = async () => {
@@ -224,6 +230,20 @@ export function CandidateTable({ candidates }: { candidates: Candidate[] }) {
             <Button variant="outline" onClick={() => setIsOpen(false)}>Batal</Button>
             <Button onClick={handleSave}>Simpan</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus kandidat ini? Tindakan ini tidak bisa dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Batal</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Ya, Hapus</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
