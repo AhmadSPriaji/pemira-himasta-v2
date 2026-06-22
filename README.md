@@ -671,8 +671,10 @@ Proyek ini bersifat **private** dan dikembangkan untuk kepentingan internal **HI
 
 <div align="center">
 
-Dikembangkan dengan ❤️ oleh **HIMASTA UGM**
+Dikembangkan oleh **AhmadSPriaji**
 
-[🌐 Website](https://pemira-himasta.netlify.app) · [📸 Instagram](https://instagram.com/himasta_ugm)
+Github : [AhmadSPriaji](https://github.com/AhmadSPriaji)
+LinkedIn : [Ahmad Siddiq Priaji](https://www.linkedin.com/in/ahmad-siddiq-priaji-b0a577262/)
+
 
 </div>
