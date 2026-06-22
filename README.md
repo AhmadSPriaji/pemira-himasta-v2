@@ -1,6 +1,6 @@
 # 🗳️ Pemira Himasta UGM v2
 
-> **Pemilihan Raya Himpunan Mahasiswa Statistika UGM** — Sistem e-voting modern, aman, dan transparan untuk memilih Ketua Himpunan dan perwakilan mahasiswa terbaik.
+> **Pemilihan Raya Himpunan Mahasiswa Statistika UGM** — Sistem e-voting modern, aman, dan transparan untuk memilih Ketua Himpunan.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
