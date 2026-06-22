@@ -128,8 +128,9 @@ export async function toggleVotersByGeneration(generation: string, isActive: boo
   if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
 
   try {
+    const whereClause = generation === "semua" ? {} : { generation }
     const result = await prisma.student.updateMany({
-      where: { generation },
+      where: whereClause,
       data: { isActive }
     })
     revalidatePath("/admin/voters")
