@@ -32,11 +32,13 @@ export function VoterTable({ voters }: { voters: Student[] }) {
   })
 
   const [bulkToggleData, setBulkToggleData] = useState({
-    generation: "2023",
+    generation: "semua",
     action: "activate"
   })
 
   const [isLoading, setIsLoading] = useState(false)
+  const [searchNim, setSearchNim] = useState("")
+  const [filterGeneration, setFilterGeneration] = useState("semua")
 
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean
@@ -102,9 +104,10 @@ export function VoterTable({ voters }: { voters: Student[] }) {
 
   const handleBulkToggle = () => {
     const isActive = bulkToggleData.action === "activate"
+    const genText = bulkToggleData.generation === "semua" ? "seluruh angkatan" : `angkatan ${bulkToggleData.generation}`
     showConfirm(
       "Konfirmasi Aksi Massal",
-      `Yakin ingin ${isActive ? 'mengaktifkan' : 'menonaktifkan'} semua pemilih angkatan ${bulkToggleData.generation}?`,
+      `Yakin ingin ${isActive ? 'mengaktifkan' : 'menonaktifkan'} semua pemilih ${genText}?`,
       "Lanjutkan",
       "default",
       async () => {
@@ -156,6 +159,16 @@ export function VoterTable({ voters }: { voters: Student[] }) {
     reader.readAsText(csvFile)
   }
 
+  // Daftar angkatan unik untuk dropdown
+  const generations = [...new Set(voters.map(v => v.generation))].sort()
+
+  // Filter voter berdasarkan pencarian
+  const filteredVoters = voters.filter(v => {
+    const matchNim = v.nim.toLowerCase().includes(searchNim.toLowerCase())
+    const matchGen = filterGeneration === "semua" || v.generation === filterGeneration
+    return matchNim && matchGen
+  })
+
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap">
@@ -168,6 +181,28 @@ export function VoterTable({ voters }: { voters: Student[] }) {
           <Power className="w-4 h-4 mr-2" />
           Aktifkan/Nonaktifkan Angkatan
         </Button>
+      </div>
+
+      <div className="flex gap-2 flex-wrap items-center">
+        <Input
+          placeholder="Cari NIM..."
+          value={searchNim}
+          onChange={(e) => setSearchNim(e.target.value)}
+          className="max-w-xs"
+        />
+        <select
+          className="h-10 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          value={filterGeneration}
+          onChange={(e) => setFilterGeneration(e.target.value)}
+        >
+          <option value="semua">Semua Angkatan</option>
+          {generations.map(gen => (
+            <option key={gen} value={gen}>{gen}</option>
+          ))}
+        </select>
+        <span className="text-sm text-muted-foreground">
+          Menampilkan {filteredVoters.length} dari {voters.length} voter
+        </span>
       </div>
 
       <Table className="bg-card rounded-md shadow-sm border">
@@ -183,7 +218,7 @@ export function VoterTable({ voters }: { voters: Student[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {voters.map((v) => (
+          {filteredVoters.map((v) => (
             <TableRow key={v.id}>
               <TableCell className="font-medium">{v.nim}</TableCell>
               <TableCell>{v.generation}</TableCell>
@@ -220,9 +255,13 @@ export function VoterTable({ voters }: { voters: Student[] }) {
               </TableCell>
             </TableRow>
           ))}
-          {voters.length === 0 && (
+          {filteredVoters.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">Belum ada data pemilih.</TableCell>
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                {searchNim || filterGeneration !== "semua"
+                  ? "Tidak ada voter yang sesuai dengan pencarian."
+                  : "Belum ada data pemilih."}
+              </TableCell>
             </TableRow>
           )}
         </TableBody>
@@ -289,7 +328,16 @@ export function VoterTable({ voters }: { voters: Student[] }) {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Angkatan (Generation)</Label>
-              <Input value={bulkToggleData.generation} onChange={e => setBulkToggleData({ ...bulkToggleData, generation: e.target.value })} placeholder="Cth: 2023" />
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                value={bulkToggleData.generation}
+                onChange={e => setBulkToggleData({ ...bulkToggleData, generation: e.target.value })}
+              >
+                <option value="semua">Semua Angkatan</option>
+                {generations.map(gen => (
+                  <option key={gen} value={gen}>{gen}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-2">
               <Label>Aksi</Label>
