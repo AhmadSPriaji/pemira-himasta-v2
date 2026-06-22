@@ -1,13 +1,17 @@
 import StepProgressBar from "../ui/StepProgress"
 import { votingContent } from "../login/LoginLayout"
 import Finish from "./Finish"
-import Navbar from "../ui/Navbar"
+import Navbar, { NavbarCandidate } from "../ui/Navbar"
 import HeaderText from "../ui/HeaderText"
 
-export default function ResponsePage() {
+export default function ResponsePage({
+  navbarCandidates,
+}: {
+  navbarCandidates: NavbarCandidate[]
+}) {
   return (
     <main className=" min-h-screen w-full bg-navy ">
-      <Navbar />
+      <Navbar candidates={navbarCandidates} />
       <div className="container mx-auto py-16 lg:py-32">
         <HeaderText
           text="Success"

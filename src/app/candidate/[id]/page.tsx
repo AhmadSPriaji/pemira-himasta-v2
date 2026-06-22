@@ -14,9 +14,15 @@ export default async function CandidatePage({
     return notFound()
   }
 
-  const candidate = await prisma.candidate.findUnique({
-    where: { candidateNumber },
-  })
+  const [candidate, allCandidates] = await Promise.all([
+    prisma.candidate.findUnique({
+      where: { candidateNumber },
+    }),
+    prisma.candidate.findMany({
+      orderBy: { candidateNumber: 'asc' },
+      select: { candidateNumber: true, name: true },
+    }),
+  ])
 
   if (!candidate) {
     return notFound()
@@ -33,6 +39,7 @@ export default async function CandidatePage({
       key={candidateProps.id}
       index={candidateProps.candidateNumber.toString()}
       candidate={candidateProps}
+      navbarCandidates={allCandidates}
     />
   )
 }

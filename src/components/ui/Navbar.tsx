@@ -3,18 +3,12 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Menu, Transition } from "@headlessui/react"
 
-// GANTI CANDIDATE DI NAVBAR
-const candidates = [
-  { name: "Daffa Athatara" },
-  {
-    name: "Fadhil Zaidan Mumtaz",
-  },
-  {
-    name: "Nasadi Akbar Nugraha",
-  },
-]
+export type NavbarCandidate = {
+  candidateNumber: number
+  name: string
+}
 
-function Navbar() {
+function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
   const router = useRouter()
   const [isHovered, setIsHovered] = useState(false)
   const [isClicked, setIsClicked] = useState(false)
@@ -92,7 +86,7 @@ function Navbar() {
             <p
               key={index}
               onClick={() => {
-                router.push("/candidate/" + (index + 1))
+                router.push("/candidate/" + candidate.candidateNumber)
               }}
               className="w-24 text-yellow transition-all duration-200 ease-out hover:text-white lg:w-32 2xl:w-36"
             >

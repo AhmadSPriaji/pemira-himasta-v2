@@ -1,5 +1,5 @@
 import HeaderText from "../ui/HeaderText"
-import Navbar from "../ui/Navbar"
+import Navbar, { NavbarCandidate } from "../ui/Navbar"
 import Login from "./Login"
 import StepProgressBar from "../ui/StepProgress"
 
@@ -18,10 +18,14 @@ export const votingContent = [
   },
 ]
 
-export default function LoginLayout() {
+export default function LoginLayout({
+  navbarCandidates,
+}: {
+  navbarCandidates: NavbarCandidate[]
+}) {
   return (
     <div className="min-h-screen w-full  bg-navy">
-      <Navbar />
+      <Navbar candidates={navbarCandidates} />
       <div className="container mx-auto py-16 lg:py-32">
         <HeaderText
           text="Login"
