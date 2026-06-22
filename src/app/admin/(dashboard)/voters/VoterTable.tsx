@@ -4,8 +4,9 @@ import { useState } from "react"
 import { addVoter, deleteVoter, resetVoterStatus, importVotersCsv, toggleVoterStatus, toggleVotersByGeneration } from "@/app/actions/voterAdmin"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { Trash2, RotateCcw, Upload, Power } from "lucide-react"
 
@@ -35,6 +36,26 @@ export function VoterTable({ voters }: { voters: Student[] }) {
     action: "activate"
   })
 
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean
+    title: string
+    description: string
+    actionLabel: string
+    variant: "default" | "destructive"
+    onConfirm: () => Promise<void> | void
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+    actionLabel: "",
+    variant: "default",
+    onConfirm: () => {}
+  })
+
+  const showConfirm = (title: string, description: string, actionLabel: string, variant: "default" | "destructive", onConfirm: () => Promise<void> | void) => {
+    setConfirmConfig({ isOpen: true, title, description, actionLabel, variant, onConfirm })
+  }
+
   const handleAdd = async () => {
     if (!formData.nim) return
     await addVoter(formData)
@@ -42,35 +63,53 @@ export function VoterTable({ voters }: { voters: Student[] }) {
     setFormData({ nim: "", generation: "2023" })
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Hapus pemilih ini?")) {
-      await deleteVoter(id)
-    }
+  const handleDelete = (id: string) => {
+    showConfirm(
+      "Konfirmasi Hapus",
+      "Hapus pemilih ini? Tindakan ini tidak dapat dibatalkan.",
+      "Ya, Hapus",
+      "destructive",
+      async () => { await deleteVoter(id) }
+    )
   }
 
-  const handleReset = async (id: string) => {
-    if (confirm("Reset status voting pemilih ini? Ini akan menghapus suaranya.")) {
-      await resetVoterStatus(id)
-    }
+  const handleReset = (id: string) => {
+    showConfirm(
+      "Reset Status Voting",
+      "Reset status voting pemilih ini? Ini akan menghapus suaranya.",
+      "Ya, Reset",
+      "destructive",
+      async () => { await resetVoterStatus(id) }
+    )
   }
 
-  const handleToggleActive = async (id: string, currentStatus: boolean) => {
-    if (confirm(`Pilih OK untuk ${currentStatus ? 'menonaktifkan' : 'mengaktifkan'} pemilih ini.`)) {
-      await toggleVoterStatus(id, !currentStatus)
-    }
+  const handleToggleActive = (id: string, currentStatus: boolean) => {
+    showConfirm(
+      "Ubah Status Aktif",
+      `Pilih lanjutkan untuk ${currentStatus ? 'menonaktifkan' : 'mengaktifkan'} pemilih ini.`,
+      "Lanjutkan",
+      "default",
+      async () => { await toggleVoterStatus(id, !currentStatus) }
+    )
   }
 
-  const handleBulkToggle = async () => {
+  const handleBulkToggle = () => {
     const isActive = bulkToggleData.action === "activate"
-    if (confirm(`Yakin ingin ${isActive ? 'mengaktifkan' : 'menonaktifkan'} semua pemilih angkatan ${bulkToggleData.generation}?`)) {
-      const result = await toggleVotersByGeneration(bulkToggleData.generation, isActive)
-      if (result && "success" in result && result.success) {
-        alert(`Berhasil mengubah status ${result.count} pemilih.`)
-        setIsBulkToggleOpen(false)
-      } else {
-        alert(result?.error || "Terjadi kesalahan")
+    showConfirm(
+      "Konfirmasi Aksi Massal",
+      `Yakin ingin ${isActive ? 'mengaktifkan' : 'menonaktifkan'} semua pemilih angkatan ${bulkToggleData.generation}?`,
+      "Lanjutkan",
+      "default",
+      async () => {
+        const result = await toggleVotersByGeneration(bulkToggleData.generation, isActive)
+        if (result && "success" in result && result.success) {
+          toast.success(`Berhasil mengubah status ${result.count} pemilih.`)
+          setIsBulkToggleOpen(false)
+        } else {
+          toast.error(result?.error || "Terjadi kesalahan")
+        }
       }
-    }
+    )
   }
 
   const handleImportCsv = async () => {
@@ -93,7 +132,7 @@ export function VoterTable({ voters }: { voters: Student[] }) {
       await importVotersCsv(parsed)
       setIsCsvOpen(false)
       setCsvFile(null)
-      alert(`Berhasil mengimport ${parsed.length} data.`)
+      toast.success(`Berhasil mengimport ${parsed.length} data.`)
     }
     reader.readAsText(csvFile)
   }
@@ -243,6 +282,23 @@ export function VoterTable({ voters }: { voters: Student[] }) {
             <Button variant="outline" onClick={() => setIsBulkToggleOpen(false)}>Batal</Button>
             <Button onClick={handleBulkToggle}>Terapkan</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm Modal */}
+      <Dialog open={confirmConfig.isOpen} onOpenChange={(isOpen) => setConfirmConfig(prev => ({ ...prev, isOpen }))}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{confirmConfig.title}</DialogTitle>
+            <DialogDescription>{confirmConfig.description}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Batal</Button>
+            <Button variant={confirmConfig.variant} onClick={async () => {
+              await confirmConfig.onConfirm()
+              setConfirmConfig(prev => ({ ...prev, isOpen: false }))
+            }}>{confirmConfig.actionLabel}</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
