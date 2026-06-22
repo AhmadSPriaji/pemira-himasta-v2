@@ -1,3 +1,5 @@
+"use client"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import HeaderText from "../ui/HeaderText"
 import Navbar, { NavbarCandidate } from "../ui/Navbar"
@@ -17,6 +19,44 @@ function formatGDriveUrl(url: string | null) {
   return url
 }
 
+function FadeIn({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const [isVisible, setIsVisible] = useState(false)
+  const domRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.1 })
+
+    const currentRef = domRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [])
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+      } ${className}`}
+    >
+      {children}
+    </div>
+  )
+}
+
 export default function CandidatePageLayout({
   candidate,
   index,
@@ -26,44 +66,54 @@ export default function CandidatePageLayout({
   candidate: CandidateProps
   navbarCandidates: NavbarCandidate[]
 }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <main className="bg-navy pt-32">
       <Navbar candidates={navbarCandidates} />
-      <section className="flex items-end justify-center">
-        <div className="relative flex h-fit w-fit">
-          <div className="flex justify-center">
-            <Image
-              src={"/landing/frame.png"}
-              width={500}
-              height={500}
-              alt="frame"
-              className="relative z-20 h-auto w-[200px] md:w-[300px] lg:w-[400px] 2xl:w-[500px]"
-            />
+      <div className={`transition-all duration-1000 ease-out transform ${
+        mounted ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-95"
+      }`}>
+        <section className="flex items-end justify-center">
+          <div className="relative flex h-fit w-fit">
+            <div className="flex justify-center">
+              <Image
+                src={"/landing/frame.png"}
+                width={500}
+                height={500}
+                alt="frame"
+                className="relative z-20 h-auto w-[200px] md:w-[300px] lg:w-[400px] 2xl:w-[500px]"
+              />
 
-            <Image
-              src={candidate.photoUrl || ""}
-              width={300}
-              height={350}
-              alt="Candidate"
-              className="absolute inset-0 m-auto h-auto w-[90px] md:w-[144px] lg:w-[194px] 2xl:w-[240px]"
-            />
+              <Image
+                src={candidate.photoUrl || ""}
+                width={300}
+                height={350}
+                alt="Candidate"
+                className="absolute inset-0 m-auto h-auto w-[90px] md:w-[144px] lg:w-[194px] 2xl:w-[240px]"
+              />
+            </div>
+
+            <h1
+              className={`absolute -bottom-6 z-30 font-head text-[100px] text-white md:text-[160px] lg:-bottom-12 lg:text-[216px] 2xl:text-[256px] ${
+                index == "1" ? "right-6 lg:right-10" : "right-3 lg:right-5"
+              }`}
+            >
+              {index}
+            </h1>
           </div>
-
-          <h1
-            className={`absolute -bottom-6 z-30 font-head text-[100px] text-white md:text-[160px] lg:-bottom-12 lg:text-[216px] 2xl:text-[256px] ${
-              index == "1" ? "right-6 lg:right-10" : "right-3 lg:right-5"
-            }`}
-          >
-            {index}
+          <h1 className="w-1/3 break-keep pb-4 font-head text-3xl text-white md:pb-14 md:text-5xl lg:text-7xl 2xl:text-8xl">
+            {candidate.name}
           </h1>
-        </div>
-        <h1 className="w-1/3 break-keep pb-4 font-head text-3xl text-white md:pb-14 md:text-5xl lg:text-7xl 2xl:text-8xl">
-          {candidate.name}
-        </h1>
-      </section>
+        </section>
+      </div>
 
       {candidate.cvUrl && (
-        <section className="mx-48 hidden flex-col items-center py-32 md:flex">
+        <FadeIn className="mx-48 hidden flex-col items-center py-32 md:flex">
           <HeaderText text="Curricculum Vitae" className="py-10" />
           <div className="h-[538px]  w-full bg-red">
             <iframe
@@ -73,11 +123,11 @@ export default function CandidatePageLayout({
               title="Curriculum Vitae"
             ></iframe>
           </div>
-        </section>
+        </FadeIn>
       )}
 
       {candidate.grandDesignUrl && (
-        <section className="mx-48 hidden flex-col items-center py-32 md:flex">
+        <FadeIn className="mx-48 hidden flex-col items-center py-32 md:flex">
           <HeaderText text="Grand Design" className="py-10" />
           <div className="h-[538px]  w-full bg-red">
             <iframe
@@ -87,10 +137,10 @@ export default function CandidatePageLayout({
               title="Grand Design"
             ></iframe>
           </div>
-        </section>
+        </FadeIn>
       )}
 
-      <div className="candidates-bg candidates-bg flex h-fit w-full justify-center bg-red p-8 text-white lg:p-16 2xl:p-24">
+      <FadeIn className="candidates-bg candidates-bg flex h-fit w-full justify-center bg-red p-8 text-white lg:p-16 2xl:p-24">
         <div className="flex h-fit w-full flex-col lg:flex-row">
           <div className=" flex flex-col bg-navy p-8 py-16 lg:w-[50%] lg:p-16 lg:py-20 2xl:p-24 2xl:py-36   ">
             <div className="flex justify-center pb-6 text-3xl text-yellow lg:pb-8 lg:text-5xl 2xl:pb-12 2xl:text-[64px]">
@@ -156,10 +206,10 @@ export default function CandidatePageLayout({
             </div>
           </div>
         </div>
-      </div>
+      </FadeIn>
 
       {candidate.innovations.length != 0 && (
-        <section className="mx-3 flex flex-col space-y-5 pb-20 pt-16 text-base lg:text-lg xl:mx-24 2xl:text-2xl">
+        <FadeIn className="mx-3 flex flex-col space-y-5 pb-20 pt-16 text-base lg:text-lg xl:mx-24 2xl:text-2xl">
           <HeaderText text="Inovasi" className="py-4 " />
           {candidate.innovations?.map((innovation, index) => (
             <div
@@ -169,7 +219,6 @@ export default function CandidatePageLayout({
               <h5 className="pb-4 font-sans text-lg font-bold lg:text-xl 2xl:pb-7 2xl:text-3xl">
                 {innovation.name}
               </h5>
-              {/* <p className="text-left">Penjelasan: </p> */}
               <ul
                 className={`text-left ${
                   innovation.explanation?.length === 1
@@ -183,7 +232,7 @@ export default function CandidatePageLayout({
               </ul>
             </div>
           ))}
-        </section>
+        </FadeIn>
       )}
     </main>
   )

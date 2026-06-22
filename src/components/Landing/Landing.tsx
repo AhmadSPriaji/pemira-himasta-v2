@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import HeaderText from "../ui/HeaderText"
 import { useRouter } from "next/navigation"
@@ -28,6 +28,44 @@ type LandingProps = {
   }
 }
 
+function FadeIn({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const [isVisible, setIsVisible] = useState(false)
+  const domRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.1 })
+
+    const currentRef = domRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [])
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+      } ${className}`}
+    >
+      {children}
+    </div>
+  )
+}
+
 export default function Landing({ content }: LandingProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
@@ -37,7 +75,7 @@ export default function Landing({ content }: LandingProps) {
   }, [])
 
   return (
-    <main className="text-yellow">
+    <main className="text-yellow overflow-x-hidden">
       {/* Hero */}
       <section className="h-screen bg-red font-head text-yellow">
         <div className="container flex h-full items-end ">
@@ -50,6 +88,7 @@ export default function Landing({ content }: LandingProps) {
               src="/landing/hero-img.svg"
               width={500}
               height={500}
+              priority
             />
             <div className="flex h-full items-center justify-center">
               <p className={`text-5xl font-thin lg:text-7xl 2xl:text-9xl transition-all duration-1000 ease-out transform ${
@@ -65,7 +104,7 @@ export default function Landing({ content }: LandingProps) {
 
       {/* About */}
       <section className="h-full bg-yellow p-8 lg:p-12 2xl:p-24">
-        <div className=" mx-auto h-full bg-navy ">
+        <FadeIn className=" mx-auto h-full bg-navy ">
           <div className="flex h-full flex-col items-center justify-between lg:flex-row">
             <div className="flex w-full items-center justify-center px-10 py-8 lg:w-1/2 lg:px-[72px] lg:py-14 2xl:px-[135px] 2xl:py-[103px]">
               <Image
@@ -86,11 +125,12 @@ export default function Landing({ content }: LandingProps) {
               </p>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
+
       {/* Timeline */}
       <section className="bg-navy px-8 py-16 lg:px-12 lg:py-24 2xl:px-24 2xl:py-[138px]">
-        <div className=" relative mx-auto h-full">
+        <FadeIn className=" relative mx-auto h-full">
           <HeaderText text="Timeline" className="mb-10 lg:mb-24 2xl:mb-32" />
           <div className="relative h-full py-10 md:py-0">
             <div className=" absolute inset-0 flex h-full w-full flex-col items-center md:flex-row">
@@ -125,12 +165,12 @@ export default function Landing({ content }: LandingProps) {
               ))}
             </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* Candidates */}
       <section className="bg-navy px-8 lg:px-12 2xl:px-24 ">
-        <div className="relative overflow-hidden border-2 border-yellow bg-navy py-6 md:bg-red md:py-16 ">
+        <FadeIn className="relative overflow-hidden border-2 border-yellow bg-navy py-6 md:bg-red md:py-16 ">
           <div className="container mx-auto flex aspect-square w-full items-center justify-center rounded-full border-yellow bg-navy md:-my-[132px] md:w-[80%] md:border-2  md:py-16 lg:-my-[190px] lg:w-[1000px]  2xl:-my-[132px] 2xl:w-[1320px] ">
             <div className="py-12 md:py-20  2xl:py-[88px]">
               <HeaderText text="Candidate" className="mb-0 md:mb-4 2xl:mb-5" />
@@ -173,11 +213,12 @@ export default function Landing({ content }: LandingProps) {
               </div>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
+
       {/* Vote Now */}
       <section className="border-b-2 border-yellow bg-navy px-12 pb-0 pt-20 lg:p-12 lg:pb-0 2xl:p-24 2xl:pb-0">
-        <div className="flex items-end justify-around ">
+        <FadeIn className="flex items-end justify-around ">
           <Image
             src={"/landing/star-nofill.svg"}
             alt="star"
@@ -211,7 +252,7 @@ export default function Landing({ content }: LandingProps) {
             height={500}
             className="mb-[132px] ml-8 hidden h-auto w-24 md:block 2xl:w-40"
           />
-        </div>
+        </FadeIn>
       </section>
 
       {/* footer */}
