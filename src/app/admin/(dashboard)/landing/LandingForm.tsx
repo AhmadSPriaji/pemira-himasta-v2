@@ -173,7 +173,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
             </div>
             <div className="space-y-2 flex-1">
               <Label>Display Tgl</Label>
-              <Input value={newEvent.displayDate} onChange={e => setNewEvent({ ...newEvent, displayDate: e.target.value })} placeholder="Cth: 10 - 13 Nov" />
+              <Input value={newEvent.displayDate} onChange={e => setNewEvent({ ...newEvent, displayDate: e.target.value })} placeholder="Cth: 10 - 13 November" />
             </div>
             <div className="space-y-2 w-28">
               <Label>Urutan Tampil</Label>
