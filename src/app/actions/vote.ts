@@ -20,6 +20,10 @@ export async function submitVote(candidateId: string) {
       return { success: false, error: "Mahasiswa tidak ditemukan." }
     }
 
+    if (!student.isActive) {
+      return { success: false, error: "Akun Anda tidak aktif." }
+    }
+
     if (student.isVoted) {
       return { success: false, error: "Kamu sudah memberikan suara sebelumnya." }
     }

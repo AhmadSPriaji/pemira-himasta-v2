@@ -13,6 +13,10 @@ export async function loginStudent(username: string, password: string) {
       return { success: false, error: "Username atau password salah." }
     }
 
+    if (!student.isActive) {
+      return { success: false, error: "Akun Anda belum diaktifkan. Hubungi panitia." }
+    }
+
     if (student.isVoted) {
       return { success: false, error: "Kamu sudah memberikan suara sebelumnya." }
     }
