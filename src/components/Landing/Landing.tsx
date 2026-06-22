@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import HeaderText from "../ui/HeaderText"
 import { useRouter } from "next/navigation"
@@ -29,6 +30,12 @@ type LandingProps = {
 
 export default function Landing({ content }: LandingProps) {
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <main className="text-yellow">
       {/* Hero */}
@@ -36,14 +43,18 @@ export default function Landing({ content }: LandingProps) {
         <div className="container flex h-full items-end ">
           <div className="flex h-[60%] w-full items-end px-[12%] lg:h-[70%] ">
             <Image
-              className="mr-8 h-full w-auto lg:mr-12 2xl:mr-16"
+              className={`mr-8 h-full w-auto lg:mr-12 2xl:mr-16 transition-all duration-1000 ease-out transform ${
+                mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              }`}
               alt="hero"
               src="/landing/hero-img.svg"
               width={500}
               height={500}
             />
             <div className="flex h-full items-center justify-center">
-              <p className="text-5xl font-thin lg:text-7xl 2xl:text-9xl">
+              <p className={`text-5xl font-thin lg:text-7xl 2xl:text-9xl transition-all duration-1000 ease-out transform ${
+                mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}>
                 {/* GANTI TAHUN */}
                 Pemilihan <br /> Raya <br /> Himasta <br /> {content.year}
               </p>
