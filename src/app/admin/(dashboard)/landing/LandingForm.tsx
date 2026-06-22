@@ -144,6 +144,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
               <TableRow>
                 <TableHead>Nama Acara</TableHead>
                 <TableHead>Display Tgl</TableHead>
+                <TableHead>Urutan</TableHead>
                 <TableHead>Voting Event?</TableHead>
                 <TableHead>Aksi</TableHead>
               </TableRow>
@@ -153,6 +154,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
                 <TableRow key={event.id}>
                   <TableCell>{event.eventName}</TableCell>
                   <TableCell>{event.displayDate}</TableCell>
+                  <TableCell>{event.sortOrder}</TableCell>
                   <TableCell>{event.isVotingEvent ? "Ya" : "Tidak"}</TableCell>
                   <TableCell>
                     <Button variant="destructive" size="icon" onClick={() => handleDeleteEventClick(event.id)}>
