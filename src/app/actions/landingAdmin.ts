@@ -52,6 +52,7 @@ export async function addTimelineEvent(data: {
   eventName: string
   displayDate: string
   isVotingEvent: boolean
+  sortOrder?: number
 }) {
   const admin = await getAdminSession()
   if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
