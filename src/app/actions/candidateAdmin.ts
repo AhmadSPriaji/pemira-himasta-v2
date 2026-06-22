@@ -1,7 +1,20 @@
 "use server"
 
+import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+
+async function getAdminSession() {
+  const cookieStore = await cookies()
+  const sessionId = cookieStore.get("admin_session")?.value
+  if (!sessionId) return null
+
+  const admin = await prisma.admin.findUnique({
+    where: { id: sessionId },
+  })
+  
+  return admin
+}
 
 export async function addCandidate(data: {
   candidateNumber: number
@@ -13,6 +26,9 @@ export async function addCandidate(data: {
   missions: string[]
   innovations: { name: string; explanation: string[] }[]
 }) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.candidate.create({
       data: {
@@ -39,6 +55,9 @@ export async function updateCandidate(id: string, data: {
   missions: string[]
   innovations: { name: string; explanation: string[] }[]
 }) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.candidate.update({
       where: { id },
@@ -57,6 +76,9 @@ export async function updateCandidate(id: string, data: {
 }
 
 export async function deleteCandidate(id: string) {
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, error: "Unauthorized: Silakan login terlebih dahulu." }
+
   try {
     await prisma.candidate.delete({ where: { id } })
     revalidatePath("/")
