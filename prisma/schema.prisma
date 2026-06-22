@@ -35,6 +35,8 @@ model Student {
   Vote       Vote?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@index([generation])
 }
 
 model Candidate {
@@ -69,6 +71,7 @@ model TimelineEvent {
   id            String   @id @default(uuid())
   eventName     String
   displayDate   String
+  sortOrder     Int      @default(0)
   isVotingEvent Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

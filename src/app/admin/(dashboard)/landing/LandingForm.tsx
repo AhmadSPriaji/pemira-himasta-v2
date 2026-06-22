@@ -23,6 +23,7 @@ type TimelineEvent = {
   id: string
   eventName: string
   displayDate: string
+  sortOrder: number
   isVotingEvent: boolean
 }
 
@@ -41,6 +42,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
   const [newEvent, setNewEvent] = useState({
     eventName: "",
     displayDate: "",
+    sortOrder: 0,
     isVotingEvent: false,
   })
 
@@ -63,6 +65,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
     const result = await addTimelineEvent({
       eventName: newEvent.eventName,
       displayDate: newEvent.displayDate,
+      sortOrder: newEvent.sortOrder,
       isVotingEvent: newEvent.isVotingEvent
     })
     
@@ -72,7 +75,7 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
     }
     
     toast.success("Timeline event berhasil ditambahkan")
-    setNewEvent({ eventName: "", displayDate: "", isVotingEvent: false })
+    setNewEvent({ eventName: "", displayDate: "", sortOrder: 0, isVotingEvent: false })
   }
 
   const handleDeleteEventClick = (id: string) => {
@@ -169,6 +172,15 @@ export function LandingForm({ initialInfo, timeline }: { initialInfo: LandingInf
             <div className="space-y-2 flex-1">
               <Label>Display Tgl</Label>
               <Input value={newEvent.displayDate} onChange={e => setNewEvent({ ...newEvent, displayDate: e.target.value })} placeholder="Cth: 10 - 13 Nov" />
+            </div>
+            <div className="space-y-2 w-28">
+              <Label>Urutan Tampil</Label>
+              <Input
+                type="number"
+                placeholder="0"
+                value={newEvent.sortOrder}
+                onChange={(e) => setNewEvent({ ...newEvent, sortOrder: parseInt(e.target.value) || 0 })}
+              />
             </div>
             <div className="space-y-2 flex flex-col justify-center">
               <Label className="mb-2">Voting Event?</Label>
