@@ -47,7 +47,7 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
     setIsLoading(true)
 
     const res = await inviteAdmin(emailToInvite)
-    
+
     if (res.success) {
       toast.success("Undangan berhasil dikirim", {
         description: `Tautan pendaftaran telah dikirim ke ${emailToInvite}`
@@ -61,7 +61,7 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
         description: res.error
       })
     }
-    
+
     setIsLoading(false)
   }
 
@@ -89,7 +89,7 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Daftar Admin</h2>
-        
+
         <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
           <DialogTrigger
             render={
@@ -173,9 +173,9 @@ export function AdminTable({ initialAdmins }: { initialAdmins: Admin[] }) {
                     })}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-destructive hover:bg-destructive/10"
                       onClick={() => handleDeleteClick(admin.id, admin.email)}
                     >

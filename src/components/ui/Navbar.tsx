@@ -1,7 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Menu, Transition } from "@headlessui/react"
 import Link from "next/link"
 
 export type NavbarCandidate = {
@@ -11,11 +10,10 @@ export type NavbarCandidate = {
 
 function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
   const router = useRouter()
-  const [isHovered, setIsHovered] = useState(false)
-  const [isClicked, setIsClicked] = useState(false)
   const [isOffset, setIsOffset] = useState(false)
+  const [dropdownState, setDropdownState] = useState<"closed" | "open" | "closing">("closed")
+  const isOpened = dropdownState === "open"
 
-  const [isOpened, setIsOpened] = useState(false)
   const handleScroll = () => {
     setIsOffset(window.scrollY > 0)
   }
@@ -46,15 +44,29 @@ function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
 
       <div
         onClick={() => {
-          setIsOpened(!isOpened)
+          if (dropdownState === "open") {
+            setDropdownState("closing")
+            const closeMs = parseFloat(
+              getComputedStyle(document.documentElement).getPropertyValue("--dropdown-close-dur")
+            ) || 150
+            setTimeout(() => {
+              setDropdownState((current) => (current === "closing" ? "closed" : current))
+            }, closeMs)
+          } else {
+            setDropdownState("open")
+          }
         }}
         onMouseOver={() => {
-          setIsOpened(true)
-          setIsHovered(true)
+          setDropdownState("open")
         }}
         onMouseLeave={() => {
-          setIsOpened(false)
-          setIsHovered(false)
+          setDropdownState("closing")
+          const closeMs = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue("--dropdown-close-dur")
+          ) || 150
+          setTimeout(() => {
+            setDropdownState((current) => (current === "closing" ? "closed" : current))
+          }, closeMs)
         }}
         className="flex h-full cursor-pointer flex-col items-center justify-center transition ease-in-out hover:text-white"
       >
@@ -66,18 +78,13 @@ function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
             } border-b-2 border-r-2 border-yellow transition duration-300 ease-in-out`}
           ></span>
         </div>
-        <Transition
-          as="div"
-          show={isOpened}
-          enter="transition ease-out duration-200"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-300"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
+        <div
+          data-origin="top-center"
           className={`${
-            isOpened ? "block" : "hidden"
-          }  absolute top-12 flex flex-col gap-2 bg-navy px-8 py-4 text-left text-base drop-shadow-md lg:top-16 lg:gap-4 lg:px-10 lg:py-5 lg:text-xl 2xl:top-[108px] 2xl:gap-5 2xl:px-12 2xl:py-6 2xl:text-2xl`}
+            dropdownState !== "closed" ? "block" : "hidden"
+          } t-dropdown ${
+            dropdownState === "open" ? "is-open" : dropdownState === "closing" ? "is-closing" : ""
+          } absolute top-12 flex flex-col gap-2 bg-navy px-8 py-4 text-left text-base drop-shadow-md lg:top-16 lg:gap-4 lg:px-10 lg:py-5 lg:text-xl 2xl:top-[108px] 2xl:gap-5 2xl:px-12 2xl:py-6 2xl:text-2xl`}
         >
           {candidates.map((candidate, index) => (
             <Link
@@ -88,7 +95,7 @@ function Navbar({ candidates = [] }: { candidates?: NavbarCandidate[] }) {
               {candidate.name}
             </Link>
           ))}
-        </Transition>
+        </div>
       </div>
     </div>
   )

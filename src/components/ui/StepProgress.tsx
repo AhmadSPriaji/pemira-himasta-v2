@@ -1,10 +1,26 @@
+export const votingContent = [
+  {
+    id: 1,
+    title: "Login",
+  },
+  {
+    id: 2,
+    title: "Vote",
+  },
+  {
+    id: 3,
+    title: "Success",
+  },
+]
+
 type StepProps = {
-  items: {
+  items?: {
     id: number
     title: string
   }[]
   onStep: number
 }
+
 const StepProgressBar = (props: StepProps) => {
   return (
     <section className="relative mb-12 flex justify-center text-white md:mb-10 2xl:mb-28">
@@ -21,7 +37,7 @@ const StepProgressBar = (props: StepProps) => {
         ></div>
       </div>
       <div className="flex w-[60%] justify-between md:w-[40%] 2xl:w-[30%]">
-        {props.items.map((content) => (
+        {(Array.isArray(props.items) ? props.items : votingContent).map((content) => (
           <div
             key={content.id}
             className="relative flex flex-col items-center justify-center"
